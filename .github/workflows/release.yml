@@ -1,0 +1,178 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  build-web:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install web dependencies
+        working-directory: web
+        run: npm ci
+
+      - name: Build web interface
+        working-directory: web
+        run: npm run build
+
+      - name: Upload web build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-build
+          path: web/dist/
+          retention-days: 1
+
+  create-release:
+    runs-on: ubuntu-latest
+    needs: build-web
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download web build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: web-build
+          path: web/dist/
+
+      - name: Get version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Create release archive
+        run: |
+          # Create release directory
+          mkdir -p jellynouncer-${{ steps.version.outputs.VERSION }}
+          
+          # Copy application files
+          cp -r src/ jellynouncer-${{ steps.version.outputs.VERSION }}/
+          cp -r web/ jellynouncer-${{ steps.version.outputs.VERSION }}/
+          cp -r config/ jellynouncer-${{ steps.version.outputs.VERSION }}/
+          cp -r templates/ jellynouncer-${{ steps.version.outputs.VERSION }}/
+          cp main.py requirements.txt jellynouncer-${{ steps.version.outputs.VERSION }}/
+          cp Dockerfile docker-compose.yml .env.example jellynouncer-${{ steps.version.outputs.VERSION }}/
+          cp README.md INSTALL.md LICENSE jellynouncer-${{ steps.version.outputs.VERSION }}/
+          
+          # Create archives
+          tar -czf jellynouncer-${{ steps.version.outputs.VERSION }}.tar.gz jellynouncer-${{ steps.version.outputs.VERSION }}/
+          zip -r jellynouncer-${{ steps.version.outputs.VERSION }}.zip jellynouncer-${{ steps.version.outputs.VERSION }}/
+
+      - name: Generate changelog
+        id: changelog
+        uses: mikepenz/release-changelog-builder-action@v4
+        with:
+          configuration: |
+            {
+              "categories": [
+                {
+                  "title": "## 🚀 Features",
+                  "labels": ["feature", "enhancement"]
+                },
+                {
+                  "title": "## 🐛 Bug Fixes", 
+                  "labels": ["bug", "fix"]
+                },
+                {
+                  "title": "## 📚 Documentation",
+                  "labels": ["documentation", "docs"]
+                },
+                {
+                  "title": "## 🔧 Maintenance",
+                  "labels": ["maintenance", "chore", "dependencies"]
+                }
+              ],
+              "template": "${{CHANGELOG}}",
+              "pr_template": "- ${{TITLE}} (#${{NUMBER}})"
+            }
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.VERSION }}
+          name: Jellynouncer ${{ steps.version.outputs.VERSION }}
+          body: |
+            # Jellynouncer ${{ steps.version.outputs.VERSION }}
+            
+            🔔 **Intelligent Discord Notifications for Jellyfin Media Server**
+            
+            ## 📦 Installation
+            
+            ### Docker (Recommended)
+            ```bash
+            docker run -d \
+              --name jellynouncer \
+              --restart unless-stopped \
+              -p 1984:1984 \
+              -e JELLYFIN_SERVER_URL=http://jellyfin:8096 \
+              -e JELLYFIN_API_KEY=your_api_key \
+              -e JELLYFIN_USER_ID=your_user_id \
+              -e DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/... \
+              -v ./config:/app/config \
+              -v ./data:/app/data \
+              -v ./logs:/app/logs \
+              -v ./templates:/app/templates \
+              markusmcnugen/jellynouncer:${{ steps.version.outputs.VERSION }}
+            ```
+            
+            ### Docker Compose
+            Download `docker-compose.yml` and `.env.example` from this release, then:
+            ```bash
+            cp .env.example .env
+            # Edit .env with your configuration
+            docker-compose up -d
+            ```
+            
+            ### Manual Installation
+            Download the source archive and follow the instructions in `INSTALL.md`.
+            
+            ## 🔗 Docker Images
+            
+            Multi-architecture images available on Docker Hub:
+            - `markusmcnugen/jellynouncer:${{ steps.version.outputs.VERSION }}`
+            - `markusmcnugen/jellynouncer:latest`
+            
+            Supported platforms: `linux/amd64`, `linux/arm64`
+            
+            ## 📋 What's Changed
+            
+            ${{ steps.changelog.outputs.changelog }}
+            
+            ## 🔧 Full Changelog
+            
+            **Full Changelog**: https://github.com/${{ github.repository }}/compare/${{ github.event.before }}...${{ github.sha }}
+            
+            ## 💬 Support
+            
+            - **Issues**: [GitHub Issues](https://github.com/${{ github.repository }}/issues)
+            - **Discussions**: [GitHub Discussions](https://github.com/${{ github.repository }}/discussions)
+            - **Documentation**: [Wiki](https://github.com/${{ github.repository }}/wiki)
+          files: |
+            jellynouncer-${{ steps.version.outputs.VERSION }}.tar.gz
+            jellynouncer-${{ steps.version.outputs.VERSION }}.zip
+          draft: false
+          prerelease: ${{ contains(steps.version.outputs.VERSION, '-') }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cleanup artifacts
+        uses: geekyeggo/delete-artifact@v5
+        with:
+          name: web-build

@@ -1,0 +1,83 @@
+{
+  "jellyfin": {
+    "server_url": "http://jellyfin:8096",
+    "api_key": "your_api_key_here",
+    "user_id": "your_user_id_here",
+    "timeout": 30
+  },
+  "discord": {
+    "webhooks": {
+      "default": {
+        "url": "https://discord.com/api/webhooks/your/default/webhook",
+        "enabled": true,
+        "grouping": {
+          "mode": "none",
+          "delay_minutes": 5,
+          "max_items": 20
+        }
+      },
+      "movies": {
+        "url": "https://discord.com/api/webhooks/your/movies/webhook",
+        "enabled": true,
+        "grouping": {
+          "mode": "type",
+          "delay_minutes": 5,
+          "max_items": 10
+        }
+      },
+      "tv": {
+        "url": "https://discord.com/api/webhooks/your/tv/webhook",
+        "enabled": true,
+        "grouping": {
+          "mode": "event",
+          "delay_minutes": 3,
+          "max_items": 15
+        }
+      },
+      "music": {
+        "url": "https://discord.com/api/webhooks/your/music/webhook",
+        "enabled": false,
+        "grouping": {
+          "mode": "both",
+          "delay_minutes": 10,
+          "max_items": 25
+        }
+      }
+    },
+    "routing": {
+      "enabled": true,
+      "fallback_webhook": "default"
+    }
+  },
+  "notifications": {
+    "watch_changes": {
+      "resolution": true,
+      "codec": true,
+      "audio_codec": true,
+      "hdr_status": true,
+      "quality": true,
+      "file_size": false
+    },
+    "filter_renames": true,
+    "filter_deletes": true,
+    "deletion_delay_seconds": 30
+  },
+  "external_apis": {
+    "omdb_api_key": "your_omdb_key_here",
+    "tmdb_api_key": "your_tmdb_key_here",
+    "tvdb_api_key": "your_tvdb_key_here",
+    "timeout": 10,
+    "cache_duration_hours": 24
+  },
+  "web": {
+    "enabled": true,
+    "port": 1985,
+    "host": "0.0.0.0",
+    "jwt_secret_key": "your-secret-key-here"
+  },
+  "system": {
+    "log_level": "INFO",
+    "max_workers": 4,
+    "enable_metrics": true
+  }
+}

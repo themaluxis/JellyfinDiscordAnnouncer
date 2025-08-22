@@ -1,0 +1,131 @@
+name: Bug Report
+description: File a bug report to help us improve Jellynouncer
+title: "[Bug]: "
+labels: ["bug", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please fill out this form as completely as possible.
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Pre-flight checklist
+      description: Please ensure you've completed these steps before submitting your bug report.
+      options:
+        - label: I have searched for [existing issues](https://github.com/MarkusMcNugen/Jellynouncer/issues) that describe my problem prior to opening this one.
+          required: true
+        - label: I have verified that I am using the latest version of Jellynouncer.
+          required: true
+        - label: I have read the [installation guide](https://github.com/MarkusMcNugen/Jellynouncer/blob/main/INSTALL.md) and [README](https://github.com/MarkusMcNugen/Jellynouncer/blob/main/README.md).
+          required: true
+
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: Describe the bug
+      description: A clear and concise description of what the bug is.
+      placeholder: Tell us what happened!
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Steps to reproduce the behavior
+      placeholder: |
+        1. Go to '...'
+        2. Click on '...'
+        3. Scroll down to '...'
+        4. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: A clear and concise description of what you expected to happen.
+      placeholder: What should have happened?
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Jellynouncer Version
+      description: What version of Jellynouncer are you running?
+      placeholder: v1.0.0
+    validations:
+      required: true
+
+  - type: dropdown
+    id: installation-method
+    attributes:
+      label: Installation Method
+      description: How did you install Jellynouncer?
+      options:
+        - Docker
+        - Docker Compose
+        - Manual Installation
+        - Other (specify in additional context)
+    validations:
+      required: true
+
+  - type: input
+    id: jellyfin-version
+    attributes:
+      label: Jellyfin Version
+      description: What version of Jellyfin are you using?
+      placeholder: 10.8.13
+    validations:
+      required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: Operating System
+      description: What operating system are you running on?
+      placeholder: Ubuntu 22.04, Windows 11, macOS 14, etc.
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
+      render: shell
+      placeholder: Paste logs here...
+
+  - type: textarea
+    id: config
+    attributes:
+      label: Configuration
+      description: Please provide your configuration (remove any sensitive information like API keys and webhook URLs)
+      render: json
+      placeholder: |
+        {
+          "jellyfin": {
+            "server_url": "http://jellyfin:8096",
+            "timeout": 30
+          },
+          "discord": {
+            "webhooks": {
+              "default": {
+                "enabled": true
+              }
+            }
+          }
+        }
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Add any other context about the problem here.
+      placeholder: Screenshots, environment details, etc.
