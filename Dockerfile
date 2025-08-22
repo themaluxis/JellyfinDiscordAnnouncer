@@ -17,7 +17,7 @@ COPY web/tailwind.config.js ./
 COPY web/postcss.config.js ./
 
 # Install dependencies
-RUN npm install --only=production
+RUN npm install
 
 # Copy web source
 COPY web/src ./src
@@ -90,7 +90,11 @@ EXPOSE 1984
 HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
     CMD python /app/healthcheck.py
 
-# Add metadata labels
+# Add metadata labels (build args must be redeclared in runtime stage)
+ARG BUILDTIME
+ARG VERSION
+ARG REVISION
+
 LABEL org.opencontainers.image.title="Jellynouncer" \
       org.opencontainers.image.description="Intelligent Discord notifications for Jellyfin media server" \
       org.opencontainers.image.version="${VERSION}" \
