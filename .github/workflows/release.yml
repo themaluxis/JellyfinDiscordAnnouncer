@@ -97,7 +97,7 @@ jobs:
                   "labels": ["maintenance", "chore", "dependencies"]
                 }
               ],
-              "template": "${{CHANGELOG}}",
+              "template": "${{UNCATEGORIZED}}",
               "pr_template": "- ${{TITLE}} (#${{NUMBER}})"
             }
         env:
