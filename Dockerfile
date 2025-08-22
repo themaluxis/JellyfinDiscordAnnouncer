@@ -17,7 +17,7 @@ COPY web/tailwind.config.js ./
 COPY web/postcss.config.js ./
 
 # Install dependencies
-RUN npm ci --only=production
+RUN npm install --only=production
 
 # Copy web source
 COPY web/src ./src
@@ -93,9 +93,9 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
 # Add metadata labels
 LABEL org.opencontainers.image.title="Jellynouncer" \
       org.opencontainers.image.description="Intelligent Discord notifications for Jellyfin media server" \
-      org.opencontainers.image.version="$VERSION" \
-      org.opencontainers.image.revision="$REVISION" \
-      org.opencontainers.image.created="$BUILDTIME" \
+      org.opencontainers.image.version="${VERSION}" \
+      org.opencontainers.image.revision="${REVISION}" \
+      org.opencontainers.image.created="${BUILDTIME}" \
       org.opencontainers.image.source="https://github.com/MarkusMcNugen/Jellynouncer" \
       org.opencontainers.image.url="https://github.com/MarkusMcNugen/Jellynouncer" \
       org.opencontainers.image.documentation="https://github.com/MarkusMcNugen/Jellynouncer/blob/main/README.md" \
