@@ -10,7 +10,7 @@ interface AppState {
   loadHealth: () => Promise<void>
 }
 
-export const useAppStore = create<AppState>((set, get) => ({
+export const useAppStore = create<AppState>((set) => ({
   loading: true,
   config: null,
   stats: null,
