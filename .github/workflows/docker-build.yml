@@ -14,7 +14,7 @@ on:
 
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: themaluxis/JellyfinDiscordAnnouncer
+  IMAGE_NAME: itsmalu/JellyfinDiscordAnnouncer
 
 jobs:
   build-and-push:
